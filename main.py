@@ -44,9 +44,11 @@ class parcurgeNod:
 
     def afisDrum(self):
         l = self.obtineDrum()
+        sir = ""
         for nod in l:
             print(str(nod))
-        return len(l)
+            sir += str(nod)
+        return len(l) , sir
 
     def contineInDrum(self, sfereNodNou):
         nodDrum = self
@@ -426,27 +428,27 @@ def check_time(start, limit):
 def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
     # in coada vom avea doar noduri de tip NodParcurgere (nodurile din arborele de parcurgere)
     c = [parcurgeNod(1,gr2.start,None,gr2.sfere,None,0,0)]
+    sol = []
     t1 = time.time()
 
     while len(c) > 0:
         if check_time(t1,timeout):
             print("depasit timp")
-            return
+            a = "depasit timp"
+            return a
 
-        print("DIMENSIUNEA COZII = " + str(len(c)))
+        # print("DIMENSIUNEA COZII = " + str(len(c)))
         # print(str(c))
         nodCurent = c.pop(0)
-        if len(c) % 1023 == 1:
-            print(str(nodCurent))
-
         if gr2.testeazaScop(nodCurent):
             print("Solutie: ")
+            sol.append(nodCurent)
             nodCurent.afisDrum()
             print("\n----------------\n")
             # input()
             nrSolutiiCautate -= 1
             if nrSolutiiCautate == 0:
-                return
+                return sol
         lSuccesori = gr2.genereazaSuccesori2(nodCurent, tip_euristica=tip_euristica)
         for s in lSuccesori:
             i = 0
@@ -476,33 +478,64 @@ timeout = int(sys.argv[4])
 # print(nrSol)
 # print(timeout)
 
+if not os.path.exists("folder_output"):                         #daca folder ul de output nu exista il creez
+    os.mkdir("folder_output")
+for numeFisier in listaFisiereInput:                        # adaug in acest folder cate un file pentru fiecare file de input unul de output
+    numeFisierOutput = "output_" + numeFisier
+    f = open("folder_output\\" + numeFisierOutput, "w")
+    f.write("")
+    f.close()
+
 ok = True
 while ok:
+    listaEur = ["euristica_banala", "admisibila1", "admisibila2", "euristica_neadmisibila"]
     optioune = input("optiuni:\n1 : ruleaza a_star  \n2 : iesi \n")
 
     if optioune == "1":
         print(listaFisiereInput)
-        # valInput = input("alegegi fisier de intrare = ")
-        # valInput = "folder_input\\input1.txt"
-        valInput = "file2.txt"
+        valInput = input("alegegi fisier de intrare = ")
 
-        if verifFile(valInput):
-            gr = Graph(valInput)
-            parcurgeNod.gr = gr
-            # gr = Graph(valInput)
-            # parcurgeNod.gr = gr
+        if valInput in listaFisiereInput:
+            valInput2 = "folder_input\\" + valInput
 
-            # euristica_banala
-            # admisibila1
-            # euristica_neadmisibila
-            t0 = time.time()
-            a_star(gr, nrSolutiiCautate=nrSol, tip_euristica="euristica_neadmisibila",timeout = timeout)
-            t1 = time.time()
+            if verifFile(valInput2):
+                gr = Graph(valInput2)
+                parcurgeNod.gr = gr
 
-            print("Alg a durat = " + str(t1 - t0))
+                print(listaEur)
+                euristica = input("alege euristica = ")
+                # euristica_banala
+                # admisibila1
+                # euristica_neadmisibila
+
+                if euristica in listaEur:
+                    t0 = time.time()
+                    sol = a_star(gr, nrSolutiiCautate=nrSol, tip_euristica=euristica,timeout = timeout)
+                    t1 = time.time()
+                    print("Alg a durat = " + str(t1 - t0))
+
+                    f = open("folder_output\\output_" +  valInput, "w")
+                    if sol == "depasit timp":
+                        f.write(sol)
+                    else:
+                        for elem in sol:
+                            f.write(elem.afisDrum()[1])
+                else:
+                    print("Euristica gresita")
+        else:
+            print("file invalid")
+
+
     elif optioune == "2":
         print("A-ti terminat")
         ok = False
+
+
+# python main.py folder_input folder_output 2 10
+
+
+
+
 
 
 
@@ -544,10 +577,6 @@ def main():
         elif optioune == "2":
             print("A-ti terminat")
             ok = False
-
-
-# python main.py folder_input folder_output 2 10
-# fa1()
 
 if __name__ == '__main__':
     # main()

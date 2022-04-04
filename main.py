@@ -4,7 +4,7 @@ import itertools
 import os
 import sys
 import math
-
+import heapq
 
 class parcurgeNod:
     gr = None      # ob graph
@@ -58,6 +58,11 @@ class parcurgeNod:
             nodDrum = nodDrum.parent
 
         return False
+
+    def __gt__(self, other):
+        if self.f == other.f:
+            return self.g < other.g
+        return self.f > other.f
 
     def __repr__(self):
         sir = ""
@@ -464,6 +469,53 @@ def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
                 c.append(s)
 
 
+def a_star_optim(gr, tip_euristica, timeout):
+    l_open = [parcurgeNod(1,gr.start,None,gr.sfere,None,0,0)]
+
+    heapq.heapify(l_open)
+
+    t1 = time.time()
+    # l_open contine nodurile candidate pentru expandare (este echivalentul lui c din A* varianta neoptimizata)
+
+    # l_closed contine nodurile expandate
+    l_closed = []
+    while len(l_open) > 0:
+        if check_time(t1,timeout):
+            print("depasit timp")
+            a = "depasit timp"
+            return a
+        # print("DIMENSIUNEA COZII = " + str(len(c)))
+        # print(str(c))
+        nodCurent = l_open.pop(0)
+        l_closed.append(nodCurent)
+
+        if gr.testeazaScop(nodCurent):
+            print("Solutie: ", end="")
+            nodCurent.afisDrum()
+            print("\n----------------\n")
+            return nodCurent
+        lSuccesori = gr.genereazaSuccesori2(nodCurent, tip_euristica=tip_euristica)
+        for s in lSuccesori:
+            gasitC = False
+            for nodC in l_open:
+                if s.info == nodC.info:
+                    gasitC = True
+                    if s.f >= nodC.f:
+                        lSuccesori.remove(s)
+                    else:  # s.f<nodC.f
+                        l_open.remove(nodC)
+                    break
+            if not gasitC:
+                for nodC in l_closed:
+                    if s.info == nodC.info:
+                        if s.f >= nodC.f:
+                            lSuccesori.remove(s)
+                        else:  # s.f<nodC.f
+                            l_closed.remove(nodC)
+                        break
+        for elem in lSuccesori:
+            heapq.heappush(l_open,elem)
+
 
 
 
@@ -489,7 +541,7 @@ for numeFisier in listaFisiereInput:                        # adaug in acest fol
 ok = True
 while ok:
     listaEur = ["euristica_banala", "admisibila1", "admisibila2", "euristica_neadmisibila"]
-    optioune = input("optiuni:\n1 : ruleaza a_star  \n2 : iesi \n")
+    optioune = input("optiuni:\n1 : ruleaza a_star  \n2 : releaza a_starOPtim\n3 : iesi \n")
 
     if optioune == "1":
         print(listaFisiereInput)
@@ -525,8 +577,40 @@ while ok:
         else:
             print("file invalid")
 
+    elif optioune =="2":
+        print(listaFisiereInput)
+        valInput = input("alegegi fisier de intrare = ")
 
-    elif optioune == "2":
+        if valInput in listaFisiereInput:
+            valInput2 = "folder_input\\" + valInput
+
+            if verifFile(valInput2):
+                gr = Graph(valInput2)
+                parcurgeNod.gr = gr
+
+                print(listaEur)
+                euristica = input("alege euristica = ")
+                # euristica_banala
+                # admisibila1
+                # euristica_neadmisibila
+
+                if euristica in listaEur:
+                    t0 = time.time()
+                    sol = a_star_optim(gr, tip_euristica=euristica, timeout=timeout)
+                    t1 = time.time()
+                    print("Alg a durat = " + str(t1 - t0))
+
+                    f = open("folder_output\\output_" + valInput, "w")
+                    if sol == "depasit timp":
+                        f.write(sol)
+                    else:
+                            f.write(sol.afisDrum()[1])
+                else:
+                    print("Euristica gresita")
+        else:
+            print("file invalid")
+
+    elif optioune == "3":
         print("A-ti terminat")
         ok = False
 

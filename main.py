@@ -430,6 +430,59 @@ def check_time(start, limit):
         return True
     return False
 
+
+def depth_first(gr, nrSolutiiCautate=1):
+    # vom simula o stiva prin relatia de parinte a nodului curent
+    df(parcurgeNod(1,gr.start,None,gr.sfere,None,0,0), nrSolutiiCautate)
+
+
+def df(nodCurent, nrSolutiiCautate):
+    if nrSolutiiCautate <= 0:  # testul acesta s-ar valida doar daca in apelul initial avem df(start,if nrSolutiiCautate=0)
+        return nrSolutiiCautate
+    print("Stiva actuala: " + "->".join(nodCurent.obtineDrum()))
+
+    if gr.testeazaScop(nodCurent):
+        print("Solutie: ", end="")
+        nodCurent.afisDrum()
+        print("\n----------------\n")
+        # input()
+        nrSolutiiCautate -= 1
+        if nrSolutiiCautate == 0:
+            return nrSolutiiCautate
+    lSuccesori = gr.genereazaSuccesori2(nodCurent)
+    for sc in lSuccesori:
+        if nrSolutiiCautate != 0:
+            nrSolutiiCautate = df(sc, nrSolutiiCautate)
+
+    return nrSolutiiCautate
+
+
+def breadth_first(gr, nrSolutiiCautate, tip_euristica, timeout):
+    # in coada vom avea doar noduri de tip NodParcurgere (nodurile din arborele de parcurgere)
+    t1 = time.time()
+    c = [parcurgeNod(1,gr.start,None,gr.sfere,None,0,0)]
+    sol = []
+
+    while len(c) > 0:
+        if check_time(t1,timeout):
+            print("depasit timp")
+            a = "depasit timp"
+            return a
+
+        # print("Coada actuala: " + str(c))
+        nodCurent = c.pop(0)
+
+        if gr.testeazaScop(nodCurent):
+            print("Solutie:")
+            nodCurent.afisDrum()
+            sol.append(nodCurent)
+            print("\n----------------\n")
+            nrSolutiiCautate -= 1
+            if nrSolutiiCautate == 0:
+                return sol
+        lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica)
+        c.extend(lSuccesori)
+
 def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
     # in coada vom avea doar noduri de tip NodParcurgere (nodurile din arborele de parcurgere)
     c = [parcurgeNod(1,gr2.start,None,gr2.sfere,None,0,0)]
@@ -519,6 +572,8 @@ def a_star_optim(gr, tip_euristica, timeout):
 
 
 
+
+
 # for i in range(len(sys.argv)):
 #     print("Argumentul {} are valoarea {} si tipul de date {}".format(i, sys.argv[i], type(sys.argv[i])))
 listaFisiereInput = os.listdir(sys.argv[1])
@@ -541,7 +596,7 @@ for numeFisier in listaFisiereInput:                        # adaug in acest fol
 ok = True
 while ok:
     listaEur = ["euristica_banala", "admisibila1", "admisibila2", "euristica_neadmisibila"]
-    optioune = input("optiuni:\n1 : ruleaza a_star  \n2 : releaza a_starOPtim\n3 : iesi \n")
+    optioune = input("optiuni:\n1 : ruleaza a_star  \n2 : releaza a_starOPtim\n3 : ruleaza bfs\n4 : iesi \n")
 
     if optioune == "1":
         print(listaFisiereInput)
@@ -572,6 +627,7 @@ while ok:
                     else:
                         for elem in sol:
                             f.write(elem.afisDrum()[1])
+                            f.write("\n----------------\n\n")
                 else:
                     print("Euristica gresita")
         else:
@@ -610,7 +666,41 @@ while ok:
         else:
             print("file invalid")
 
-    elif optioune == "3":
+    if optioune == "3":
+        print(listaFisiereInput)
+        valInput = input("alegegi fisier de intrare = ")
+
+        if valInput in listaFisiereInput:
+            valInput2 = "folder_input\\" + valInput
+
+            if verifFile(valInput2):
+                gr = Graph(valInput2)
+                parcurgeNod.gr = gr
+
+                # print(listaEur)
+                # euristica = input("alege euristica = ")
+                # euristica_banala
+                # admisibila1
+                # euristica_neadmisibila
+
+
+                t0 = time.time()
+                sol = breadth_first(gr, nrSolutiiCautate=nrSol, tip_euristica="euristica_banala",timeout = timeout)
+                t1 = time.time()
+                print("Alg a durat = " + str(t1 - t0))
+
+                f = open("folder_output\\output_" + valInput, "w")
+                if sol == "depasit timp":
+                    f.write(sol)
+                else:
+                    for elem in sol:
+                        f.write(elem.afisDrum()[1])
+                        f.write("\n----------------\n\n")
+
+        else:
+            print("file invalid")
+
+    elif optioune == "4":
         print("A-ti terminat")
         ok = False
 

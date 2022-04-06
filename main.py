@@ -431,28 +431,136 @@ def check_time(start, limit):
     return False
 
 
-def depth_first(gr, nrSolutiiCautate=1):
-    # vom simula o stiva prin relatia de parinte a nodului curent
-    df(parcurgeNod(1,gr.start,None,gr.sfere,None,0,0), nrSolutiiCautate)
+sol = []
 
 
-def df(nodCurent, nrSolutiiCautate):
-    if nrSolutiiCautate <= 0:  # testul acesta s-ar valida doar daca in apelul initial avem df(start,if nrSolutiiCautate=0)
-        return nrSolutiiCautate
-    print("Stiva actuala: " + "->".join(nodCurent.obtineDrum()))
 
-    if gr.testeazaScop(nodCurent):
-        print("Solutie: ", end="")
+def construieste_drum(gr, nodCurent, limita, nrSolutiiCautate, timeout, t1):
+    # print("A ajuns la: ", nodCurent)
+    if check_time(t1, timeout):
+        print("depasit timp")
+        return 0, "depasit timp"
+    global sol
+    if nodCurent.f > limita:
+        return nrSolutiiCautate, nodCurent.f
+    if gr.testeazaScop(nodCurent) and nodCurent.f == limita:
+        # print("Solutie: ")
         nodCurent.afisDrum()
+        # print(limita)
         print("\n----------------\n")
+        # input()
+        sol.append(nodCurent)
+        nrSolutiiCautate -= 1
+        if nrSolutiiCautate == 0:
+            return 0, "gata"
+    lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica="euristica_banala")
+    minim = float('inf')
+    for s in lSuccesori:
+        nrSolutiiCautate, rez = construieste_drum(gr, s, limita, nrSolutiiCautate, timeout, t1)
+        if rez == "gata":
+            return 0, "gata"
+        if rez == "depasit timp":
+            return 0, "gata"
+
+        # print("Compara ", rez, " cu ", minim)
+
+        if rez < minim:
+            minim = rez
+            # print("Noul minim: ", minim)
+    return nrSolutiiCautate, minim
+
+def ida_star(gr, nrSolutiiCautate, timeout):
+    t1 = time.time()
+    nodStart = parcurgeNod(1,gr.start,None,gr.sfere,None,0,0)
+    global sol
+    sol = []
+    limita = nodStart.f
+    while True:
+
+        # print("Limita de pornire: ", limita)
+        nrSolutiiCautate, rez = construieste_drum(gr, nodStart, limita, nrSolutiiCautate, timeout, t1)
+        if rez == "gata" or rez == "depasit timp":
+            break
+        if rez == float('inf'):
+            # print("Nu mai exista solutii!")
+            break
+        limita = rez
+        # print(">>> Limita noua: ", limita)
+    return sol
+
+
+
+
+
+def dfi(nodCurent, adancime, nrSolutiiCautate, tip_euristica, timeout, t1):
+    # print("Stiva actuala: " + "->".join(nodCurent.obtineDrum()))
+    if check_time(t1, timeout):
+        print("depasit timp")
+        a = "depasit timp"
+        return a
+    if adancime == 1 and gr.testeazaScop(nodCurent):
+        global sol
+        # print("Solutie: ", end="")
+        # nodCurent.afisDrum()
+        # print("\n----------------\n")
+        # input()
+        sol.append(nodCurent)
+        nrSolutiiCautate -= 1
+        if nrSolutiiCautate == 0:
+            return nrSolutiiCautate
+    if adancime > 1:
+        lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica)
+        for sc in lSuccesori:
+            if nrSolutiiCautate != 0:
+                nrSolutiiCautate = dfi(sc, adancime - 1, nrSolutiiCautate, tip_euristica, timeout, t1)
+    return nrSolutiiCautate
+
+
+def depth_first_iterativ(gr, nrSolutiiCautate, tip_euristica, timeout):
+    t1 = time.time()
+    global sol
+    sol = []
+    for i in range(2000):
+        dfi(parcurgeNod(1,gr.start,None,gr.sfere,None,0,0), i, nrSolutiiCautate,tip_euristica,timeout,t1)
+        print(i)
+        if sol != []:
+            break
+    return sol
+
+
+
+def depth_first(gr, nrSolutiiCautate, tip_euristica, timeout):
+    # vom simula o stiva prin relatia de parinte a nodului curent
+    t1 = time.time()
+    global sol
+    sol = []
+    df(parcurgeNod(1,gr.start,None,gr.sfere,None,0,0), nrSolutiiCautate,tip_euristica, timeout,t1)
+    return sol
+
+
+def df(nodCurent, nrSolutiiCautate,tip_euristica, timeout,t1):
+    # if nrSolutiiCautate <= 0:  # testul acesta s-ar valida doar daca in apelul initial avem df(start,if nrSolutiiCautate=0)
+    #     return sol
+    if check_time(t1, timeout):
+        print("depasit timp")
+        a = "depasit timp"
+        return a
+
+    # print("Stiva actuala: " + "->".join(nodCurent.obtineDrum()))
+    if gr.testeazaScop(nodCurent):
+        global sol
+        # print("Solutie: ", end="")
+        # nodCurent.afisDrum()
+        sol.append(nodCurent)
+        # print("\n----------------\n")
         # input()
         nrSolutiiCautate -= 1
         if nrSolutiiCautate == 0:
             return nrSolutiiCautate
-    lSuccesori = gr.genereazaSuccesori2(nodCurent)
+    lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica)
     for sc in lSuccesori:
         if nrSolutiiCautate != 0:
-            nrSolutiiCautate = df(sc, nrSolutiiCautate)
+            nrSolutiiCautate = df(sc, nrSolutiiCautate,tip_euristica, timeout,t1)
 
     return nrSolutiiCautate
 
@@ -596,7 +704,8 @@ for numeFisier in listaFisiereInput:                        # adaug in acest fol
 ok = True
 while ok:
     listaEur = ["euristica_banala", "admisibila1", "admisibila2", "euristica_neadmisibila"]
-    optioune = input("optiuni:\n1 : ruleaza a_star  \n2 : releaza a_starOPtim\n3 : ruleaza bfs\n4 : iesi \n")
+    optioune = input("optiuni:\n1 : ruleaza a_star  \n2 : releaza a_starOPtim\n3 : ruleaza bfs\n4 : ruleaza dfs\n"
+                     "5 : ruleaza dfi\n6 : ruleaza ida_star\n7 : iesi \n")
 
     if optioune == "1":
         print(listaFisiereInput)
@@ -699,8 +808,105 @@ while ok:
 
         else:
             print("file invalid")
+    if optioune == "4":
+        print(listaFisiereInput)
+        valInput = input("alegegi fisier de intrare = ")
 
-    elif optioune == "4":
+        if valInput in listaFisiereInput:
+            valInput2 = "folder_input\\" + valInput
+
+            if verifFile(valInput2):
+                gr = Graph(valInput2)
+                parcurgeNod.gr = gr
+
+                # print(listaEur)
+                # euristica = input("alege euristica = ")
+                # euristica_banala
+                # admisibila1
+                # euristica_neadmisibila
+
+
+                t0 = time.time()
+                sol = depth_first(gr, nrSolutiiCautate=nrSol, tip_euristica="euristica_banala",timeout = timeout)
+                t1 = time.time()
+                print("Alg a durat = " + str(t1 - t0))
+
+                f = open("folder_output\\output_" + valInput, "w")
+                if sol == []:
+                    f.write("Limata timp depasita")
+                else:
+                    for elem in sol:
+                        f.write(elem.afisDrum()[1])
+                        f.write("\n----------------\n\n")
+
+        else:
+            print("file invalid")
+    if optioune == "5":
+        print(listaFisiereInput)
+        valInput = input("alegegi fisier de intrare = ")
+
+        if valInput in listaFisiereInput:
+            valInput2 = "folder_input\\" + valInput
+
+            if verifFile(valInput2):
+                gr = Graph(valInput2)
+                parcurgeNod.gr = gr
+
+                # print(listaEur)
+                # euristica = input("alege euristica = ")
+                # euristica_banala
+                # admisibila1
+                # euristica_neadmisibila
+
+
+                t0 = time.time()
+                sol = depth_first_iterativ(gr, nrSolutiiCautate=nrSol, tip_euristica="euristica_banala",timeout = timeout)
+                t1 = time.time()
+                print("Alg a durat = " + str(t1 - t0))
+
+                f = open("folder_output\\output_" + valInput, "w")
+                if sol == []:
+                    f.write("Limata timp depasita")
+                else:
+                    for elem in sol:
+                        f.write(elem.afisDrum()[1])
+                        f.write("\n----------------\n\n")
+
+        else:
+            print("file invalid")
+    if optioune == "6":
+        print(listaFisiereInput)
+        valInput = input("alegegi fisier de intrare = ")
+
+        if valInput in listaFisiereInput:
+            valInput2 = "folder_input\\" + valInput
+
+            if verifFile(valInput2):
+                gr = Graph(valInput2)
+                parcurgeNod.gr = gr
+
+                # print(listaEur)
+                # euristica = input("alege euristica = ")
+                # euristica_banala
+                # admisibila1
+                # euristica_neadmisibila
+
+                t0 = time.time()
+                sol = ida_star(gr, nrSolutiiCautate = nrSol, timeout = timeout)
+                t1 = time.time()
+                print("Alg a durat = " + str(t1 - t0))
+
+                f = open("folder_output\\output_" + valInput, "w")
+                if sol == []:
+                    f.write("Limata timp depasita")
+                else:
+                    for elem in sol:
+                        f.write(elem.afisDrum()[1])
+                        f.write("\n----------------\n\n")
+
+        else:
+            print("file invalid")
+    elif optioune == "7":
         print("A-ti terminat")
         ok = False
 
@@ -713,45 +919,4 @@ while ok:
 
 
 
-def main():
-    for i in range(len(sys.argv)):
-        print("Argumentul {} are valoarea {} si tipul de date {}".format(i, sys.argv[i], type(sys.argv[i])))
-    listaFisiereInput = os.listdir(sys.argv[1])
-    listaFisiereOutput = os.listdir(sys.argv[2])
-    nrSol = int(sys.argv[3])
-    timeout = int(sys.argv[4])
-    # print(listaFisiereInput)
-    # print(listaFisiereOutput)
-    # print(nrSol)
-    # print(timeout)
 
-
-    ok = True
-    while ok:
-        optioune = input("optiuni:\n1 : ruleaza a_star  \n2 : iesi \n")
-
-        if optioune == "1":
-            print(listaFisiereInput)
-            # valInput = input("alegegi fisier de intrare = ")
-            # valInput = "folder_input\\input1.txt"
-            valInput = "file2.txt"
-
-            if verifFile(valInput):
-                global glob
-                gr = Graph(valInput)
-                glob = gr
-                # gr = Graph(valInput)
-                # parcurgeNod.gr = gr
-
-                t0 = time.time()
-                a_star(gr, nrSolutiiCautate=nrSol, tip_euristica="admisibila1",timeout = timeout)
-                t1 = time.time()
-
-                print("Alg a durat = " + str(t1 - t0))
-        elif optioune == "2":
-            print("A-ti terminat")
-            ok = False
-
-if __name__ == '__main__':
-    # main()
-    print('')

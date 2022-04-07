@@ -432,11 +432,16 @@ def check_time(start, limit):
 
 
 sol = []
-
+lmaxSuc = []
+lmaxCoada = []
+lTimpi = []
+maxSuc = 0
+maxCoada = 0   # nr el coada cand avem recursie
 
 
 def construieste_drum(gr, nodCurent, limita, nrSolutiiCautate, timeout, t1):
     # print("A ajuns la: ", nodCurent)
+    global maxSuc, maxCoada
     if check_time(t1, timeout):
         print("depasit timp")
         return 0, "depasit timp"
@@ -448,12 +453,19 @@ def construieste_drum(gr, nodCurent, limita, nrSolutiiCautate, timeout, t1):
         nodCurent.afisDrum()
         # print(limita)
         print("\n----------------\n")
-        # input()
         sol.append(nodCurent)
+        global lmaxSuc, lmaxCoada, lTimpi
+        lmaxCoada.append(maxCoada)
+        lmaxSuc.append(maxSuc)
+        t2 = time.time()
+        lTimpi.append(t2 - t1)
+
         nrSolutiiCautate -= 1
         if nrSolutiiCautate == 0:
             return 0, "gata"
     lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica="euristica_banala")
+    maxSuc = max(maxSuc, len(lSuccesori))
+    maxCoada += len(lSuccesori)
     minim = float('inf')
     for s in lSuccesori:
         nrSolutiiCautate, rez = construieste_drum(gr, s, limita, nrSolutiiCautate, timeout, t1)
@@ -474,6 +486,13 @@ def ida_star(gr, nrSolutiiCautate, timeout):
     nodStart = parcurgeNod(1,gr.start,None,gr.sfere,None,0,0)
     global sol
     sol = []
+    global lmaxSuc, lmaxCoada, lTimpi, maxSuc, maxCoada
+    lmaxCoada = []
+    lmaxSuc = []
+    lTimpi = []
+    maxSuc = 0
+    maxCoada = 0
+
     limita = nodStart.f
     while True:
 
@@ -494,22 +513,30 @@ def ida_star(gr, nrSolutiiCautate, timeout):
 
 def dfi(nodCurent, adancime, nrSolutiiCautate, tip_euristica, timeout, t1):
     # print("Stiva actuala: " + "->".join(nodCurent.obtineDrum()))
+    global maxSuc, maxCoada
     if check_time(t1, timeout):
         print("depasit timp")
         a = "depasit timp"
         return a
     if adancime == 1 and gr.testeazaScop(nodCurent):
         global sol
+        global lmaxSuc, lmaxCoada, lTimpi
         # print("Solutie: ", end="")
         # nodCurent.afisDrum()
         # print("\n----------------\n")
         # input()
         sol.append(nodCurent)
+        lmaxCoada.append(maxCoada)
+        lmaxSuc.append(maxSuc)
+        t2 = time.time()
+        lTimpi.append(t2 - t1)
         nrSolutiiCautate -= 1
         if nrSolutiiCautate == 0:
             return nrSolutiiCautate
     if adancime > 1:
         lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica)
+        maxSuc = max(maxSuc, len(lSuccesori))
+        maxCoada += len(lSuccesori)
         for sc in lSuccesori:
             if nrSolutiiCautate != 0:
                 nrSolutiiCautate = dfi(sc, adancime - 1, nrSolutiiCautate, tip_euristica, timeout, t1)
@@ -520,6 +547,12 @@ def depth_first_iterativ(gr, nrSolutiiCautate, tip_euristica, timeout):
     t1 = time.time()
     global sol
     sol = []
+    global lmaxSuc, lmaxCoada, lTimpi, maxSuc, maxCoada
+    lmaxCoada = []
+    lmaxSuc = []
+    lTimpi = []
+    maxSuc = 0
+    maxCoada = 0
     for i in range(2000):
         dfi(parcurgeNod(1,gr.start,None,gr.sfere,None,0,0), i, nrSolutiiCautate,tip_euristica,timeout,t1)
         print(i)
@@ -534,13 +567,21 @@ def depth_first(gr, nrSolutiiCautate, tip_euristica, timeout):
     t1 = time.time()
     global sol
     sol = []
+    global lmaxSuc, lmaxCoada, lTimpi, maxSuc,maxCoada
+    lmaxCoada = []
+    lmaxSuc = []
+    lTimpi = []
+    maxSuc = 0
+    maxCoada =0
     df(parcurgeNod(1,gr.start,None,gr.sfere,None,0,0), nrSolutiiCautate,tip_euristica, timeout,t1)
     return sol
+
 
 
 def df(nodCurent, nrSolutiiCautate,tip_euristica, timeout,t1):
     # if nrSolutiiCautate <= 0:  # testul acesta s-ar valida doar daca in apelul initial avem df(start,if nrSolutiiCautate=0)
     #     return sol
+    global maxSuc , maxCoada
     if check_time(t1, timeout):
         print("depasit timp")
         a = "depasit timp"
@@ -549,15 +590,22 @@ def df(nodCurent, nrSolutiiCautate,tip_euristica, timeout,t1):
     # print("Stiva actuala: " + "->".join(nodCurent.obtineDrum()))
     if gr.testeazaScop(nodCurent):
         global sol
+        global lmaxSuc, lmaxCoada, lTimpi
         # print("Solutie: ", end="")
         # nodCurent.afisDrum()
         sol.append(nodCurent)
+        lmaxCoada.append(maxCoada)
+        lmaxSuc.append(maxSuc)
+        t2 = time.time()
+        lTimpi.append(t2 - t1)
         # print("\n----------------\n")
         # input()
         nrSolutiiCautate -= 1
         if nrSolutiiCautate == 0:
             return nrSolutiiCautate
     lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica)
+    maxSuc = max(maxSuc,len(lSuccesori))
+    maxCoada += len(lSuccesori)
     for sc in lSuccesori:
         if nrSolutiiCautate != 0:
             nrSolutiiCautate = df(sc, nrSolutiiCautate,tip_euristica, timeout,t1)
@@ -570,6 +618,12 @@ def breadth_first(gr, nrSolutiiCautate, tip_euristica, timeout):
     t1 = time.time()
     c = [parcurgeNod(1,gr.start,None,gr.sfere,None,0,0)]
     sol = []
+    global lmaxSuc, lmaxCoada, lTimpi
+    lmaxCoada = []
+    lmaxSuc = []
+    lTimpi = []
+    maxSuc = 0
+
 
     while len(c) > 0:
         if check_time(t1,timeout):
@@ -584,11 +638,16 @@ def breadth_first(gr, nrSolutiiCautate, tip_euristica, timeout):
             print("Solutie:")
             nodCurent.afisDrum()
             sol.append(nodCurent)
+            lmaxCoada.append(len(c))
+            lmaxSuc.append(maxSuc)
+            t2 = time.time()
+            lTimpi.append(t2 - t1)
             print("\n----------------\n")
             nrSolutiiCautate -= 1
             if nrSolutiiCautate == 0:
                 return sol
         lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica)
+        maxSuc = max(maxSuc, len(lSuccesori))
         c.extend(lSuccesori)
 
 def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
@@ -596,7 +655,11 @@ def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
     c = [parcurgeNod(1,gr2.start,None,gr2.sfere,None,0,0)]
     sol = []
     t1 = time.time()
-
+    global maxSuc , lmaxSuc , lmaxCoada, lTimpi
+    lmaxCoada = []
+    lmaxSuc = []
+    lTimpi = []
+    maxSuc = 0
     while len(c) > 0:
         if check_time(t1,timeout):
             print("depasit timp")
@@ -607,8 +670,12 @@ def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
         # print(str(c))
         nodCurent = c.pop(0)
         if gr2.testeazaScop(nodCurent):
+            t2 = time.time()
             print("Solutie: ")
             sol.append(nodCurent)
+            lmaxCoada.append(len(c))
+            lmaxSuc.append(maxSuc)
+            lTimpi.append(t2 - t1)
             nodCurent.afisDrum()
             print("\n----------------\n")
             # input()
@@ -616,6 +683,7 @@ def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
             if nrSolutiiCautate == 0:
                 return sol
         lSuccesori = gr2.genereazaSuccesori2(nodCurent, tip_euristica=tip_euristica)
+        maxSuc = max(maxSuc,len(lSuccesori))
         for s in lSuccesori:
             i = 0
             gasit_loc = False
@@ -632,8 +700,13 @@ def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
 
 def a_star_optim(gr, tip_euristica, timeout):
     l_open = [parcurgeNod(1,gr.start,None,gr.sfere,None,0,0)]
-
     heapq.heapify(l_open)
+
+    global lmaxSuc, lmaxCoada, lTimpi
+    lmaxCoada = []
+    lmaxSuc = []
+    lTimpi = []
+    maxSuc = 0
 
     t1 = time.time()
     # l_open contine nodurile candidate pentru expandare (este echivalentul lui c din A* varianta neoptimizata)
@@ -653,9 +726,14 @@ def a_star_optim(gr, tip_euristica, timeout):
         if gr.testeazaScop(nodCurent):
             print("Solutie: ", end="")
             nodCurent.afisDrum()
+            lmaxCoada.append(len(l_open))
+            lmaxSuc.append(maxSuc)
+            t2 = time.time()
+            lTimpi.append(t2 - t1)
             print("\n----------------\n")
             return nodCurent
         lSuccesori = gr.genereazaSuccesori2(nodCurent, tip_euristica=tip_euristica)
+        maxSuc = max(maxSuc, len(lSuccesori))
         for s in lSuccesori:
             gasitC = False
             for nodC in l_open:
@@ -734,9 +812,15 @@ while ok:
                     if sol == "depasit timp":
                         f.write(sol)
                     else:
+                        i = 0
                         for elem in sol:
+
                             f.write(elem.afisDrum()[1])
+                            f.write("\nMax de succesori generati =  " +str(lmaxSuc[i]) +"\n")
+                            f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                            f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
                             f.write("\n----------------\n\n")
+                            i+=1
                 else:
                     print("Euristica gresita")
         else:
@@ -770,6 +854,9 @@ while ok:
                         f.write(sol)
                     else:
                             f.write(sol.afisDrum()[1])
+                            f.write("\nMax de succesori generati =  " + str(lmaxSuc[0]) + "\n")
+                            f.write("Nr de el dinlista =  " + str(lmaxCoada[0]) + "\n")
+                            f.write("Timp gasire =  " + str(lTimpi[0]) + "\n")
                 else:
                     print("Euristica gresita")
         else:
@@ -802,9 +889,14 @@ while ok:
                 if sol == "depasit timp":
                     f.write(sol)
                 else:
+                    i = 0
                     for elem in sol:
                         f.write(elem.afisDrum()[1])
+                        f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                        f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                        f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
                         f.write("\n----------------\n\n")
+                        i+=1
 
         else:
             print("file invalid")
@@ -835,9 +927,14 @@ while ok:
                 if sol == []:
                     f.write("Limata timp depasita")
                 else:
+                    i = 0
                     for elem in sol:
                         f.write(elem.afisDrum()[1])
+                        f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                        f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                        f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
                         f.write("\n----------------\n\n")
+                        i += 1
 
         else:
             print("file invalid")
@@ -868,9 +965,14 @@ while ok:
                 if sol == []:
                     f.write("Limata timp depasita")
                 else:
+                    i = 0
                     for elem in sol:
                         f.write(elem.afisDrum()[1])
+                        f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                        f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                        f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
                         f.write("\n----------------\n\n")
+                        i += 1
 
         else:
             print("file invalid")
@@ -900,10 +1002,14 @@ while ok:
                 if sol == []:
                     f.write("Limata timp depasita")
                 else:
+                    i = 0
                     for elem in sol:
                         f.write(elem.afisDrum()[1])
+                        f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                        f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                        f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
                         f.write("\n----------------\n\n")
-
+                        i += 1
         else:
             print("file invalid")
     elif optioune == "7":

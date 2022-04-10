@@ -1021,7 +1021,7 @@ while ok:
         else:
             print("file invalid")
     elif optioune == "7":
-        print("A-ti terminat")
+        print("ati terminat")
         ok = False
 
 

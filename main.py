@@ -18,14 +18,14 @@ class parcurgeNod:
         self.h = h
         self.f = self.h + self.g
 
-        self.info2 = copy.deepcopy(gr.matGraf)
+        self.info2 = copy.deepcopy(gr.matGraf)      # pt a reprezenta cu .#%@ matricea
         for poz in self.sfere:
             if poz in gr.scopuri:
                 self.info2[poz[0]][poz[1]] = "%"
             else:
                 self.info2[poz[0]][poz[1]] = "@"
         if id == 1:
-            self.matSchimbari = gr.marModif
+            self.matSchimbari = gr.marModif          # pt a retine micsorarea unui turn
         else:
             self.matSchimbari = matSchimbari
 
@@ -59,7 +59,7 @@ class parcurgeNod:
 
         return False
 
-    def __gt__(self, other):
+    def __gt__(self, other):            # operatorul > pt f si daca sunt egale ret cul cu g mai mic
         if self.f == other.f:
             return self.g < other.g
         return self.f > other.f
@@ -69,9 +69,9 @@ class parcurgeNod:
         sir = sir + str(self.sfere)
         return sir
 
-    def __str__(self):
+    def __str__(self):              #afisare ca in exemplu
         sir = str(self.id) + ")\n"
-        if self.parent != None:
+        if self.parent != None:                 # pt a afisa schimbarile turnurilor se face rap cu parintele
             mat1 = self.matSchimbari
             mat2 = self.parent.matSchimbari
             l = len(mat1)
@@ -81,31 +81,31 @@ class parcurgeNod:
                         sir += "turnul (" + str(i) +","+str(j)+") " + "a scazut cu " + str(mat1[i][j] - mat2[i][j] ) + "\n"
             sir += 'afis noduri modif\n'
         sir += "cost:" +str(self.g) + "\nMat turn: \n"
-        for linie in self.info:
+        for linie in self.info:             # afis mat h turnuri
             for elem in linie:
                 sir += str(elem) + " "
             sir += "\n"
         sir += "Mat sfere: \n"
-        for linie in self.info2:
+        for linie in self.info2:           # afis reprezentare .@#%
             for elem in linie:
                 sir += str(elem) + " "
             sir += "\n"
         return sir
 
-    def __gt__(self, other):
-        if self.f == other.f:
-            return self.g < other.g
-        return self.f > other.f
+    # def __gt__(self, other):
+    #     if self.f == other.f:
+    #         return self.g < other.g
+    #     return self.f > other.f
 
 
 class Graph:
 
-    def __init__(self,numeFisier):
+    def __init__(self,numeFisier):  #constructor cu nume fisier
         f = open(numeFisier,'r')
         primaLin = f.readline()
         l = primaLin.split()
-        self.k = int(l[0])
-        self.distMax = int(l[1])
+        self.k = int(l[0])          # k de pe prima linie
+        self.distMax = int(l[1])    # dist max de pe prima linie
 
         self.start = []
         self.matGraf = []
@@ -115,16 +115,16 @@ class Graph:
         self.scopuri = []
         rest = f.read()
         l = rest.split("sfere\n")
-        l2 = l[0].strip().split("\n")
+        l2 = l[0].strip().split("\n")   # liniile matricei din fisier
         for linie in l2:
             lMat = []
             lMat2 = []
             lMat3 = []
             for elem in linie.split():
-                lMat.append(int(elem))
+                lMat.append(int(elem))          # gelaram liniile pt info, info2, si mat cu schimbari
                 lMat2.append('.')
                 lMat3.append(0)
-            self.start.append(lMat)
+            self.start.append(lMat)             # append la liniile generate
             self.matGraf.append(lMat2)
             self.marModif.append(lMat3)
 
@@ -136,7 +136,7 @@ class Graph:
             lMat = []
             for elem in rand.split():
                 lMat.append(int(elem))
-            self.sfere.append(lMat)
+            self.sfere.append(lMat)                         # lista de sfere
 
         # print(str(self.sfere))
 
@@ -144,7 +144,7 @@ class Graph:
             lMat = []
             for elem in rand.split():
                 lMat.append(int(elem))
-            self.scopuri.append(lMat)
+            self.scopuri.append(lMat)                   #lista de porti
 
 
         for iesire in self.scopuri:
@@ -153,7 +153,7 @@ class Graph:
         #     print(rand)
         # print(self.scopuri)
 
-    def testeazaScop(self, nodCurent):
+    def testeazaScop(self, nodCurent):          # verif daca bilele sunt la porti
         locSfere = nodCurent.sfere
         for loc in locSfere:
             if locSfere.count(loc) > 1:
@@ -171,13 +171,12 @@ class Graph:
             for i in range(poz[0] - self.distMax, poz[0] + self.distMax + 1):
                 for j in range(poz[1] - self.distMax, poz[1] + self.distMax + 1):
                     if abs(i - poz[0]) + abs(j - poz[1]) <= self.distMax and [i,j] != poz and i >= 0 and \
-                            i<len(self.start) and j<len(self.start) and j >=0:     # poz turnurilor pt dist manhattan
+                            i<len(self.start) and j<len(self.start) and j >=0:          # poz turnurilor pt dist manhattan
                         lcomb.append([i,j])
 
-        # listaSuccesori = list(map(list,itertools.combinations(listaSuccesori,math.ceil(len(pozSf)*2/3))))
-        lcomb = list(itertools.combinations(lcomb, math.ceil(len(pozSf) * 2 / 3)))                  # generarea de combinari
+        lcomb = list(itertools.combinations(lcomb, math.ceil(len(pozSf) * 2 / 3)))                      # generarea de combinari
 
-        def bilaApoape(turn,lPozsfere):
+        def bilaApoape(turn,lPozsfere):                                     # fun care determina cea mai apropiata bila de un turn
             pozM = 10000
             poz = turn
             for elem in lPozsfere:
@@ -186,7 +185,7 @@ class Graph:
                     poz = elem
             return poz
 
-        def genPoz(coord,maxx):
+        def genPoz(coord,maxx):                     # lista cu poz pe care poate merge o bila data sus jos st dr
             l = []
             if coord[0] - 1 >= 0:
                 l.append([coord[0] - 1, coord[1]])
@@ -201,7 +200,7 @@ class Graph:
 
         # print(bilaApoape([3, 2], self.sfere))
 
-        lPos = []                   # pentru toate bilele toate posibilitatile
+        lPos = []                           # pentru toate bilele toate posibilitatile
         for elem in nodCurent.sfere:
             ghe = genPoz(elem,len(self.start))
             lPos.append(ghe)
@@ -221,15 +220,15 @@ class Graph:
                 # print(mainTurn)
                 distM = abs(mainTurn[0] - elem[0]) + abs(mainTurn[1] - elem[1])
                 val = copieM[elem[0]][elem[1]] - copieM[mainTurn[0]][mainTurn[1]]
-                if(val > 0):
+                if(val > 0):                        #daca turnul pe care e bila e mai mic ca turnul pe care vreau sa l modific
                     if(val + distM < self.k):
-                        copieM[elem[0]][elem[1]] -= val + distM
+                        copieM[elem[0]][elem[1]] -= val + distM     #varianta optima de a micii un turn vecin
                         copieD[elem[0]][elem[1]] += val + distM
                         # trebuie retinuta schimbarea in cv dict pt costul unei eventuale muttari
                     else:
-                        copieM[elem[0]][elem[1]] -= self.k
+                        copieM[elem[0]][elem[1]] -= self.k          #scad maxim daca nu devine mai mic dupa schimbare
                         copieD[elem[0]][elem[1]] += self.k
-                else:
+                else:                               # daca nu e mai mic turnul pe care e bila fac doar -1 minim
                     copieM[elem[0]][elem[1]] -= 1
                     copieD[elem[0]][elem[1]] += 1
             if ok == 0:
@@ -266,17 +265,17 @@ class Graph:
                     pozSfereNoi.append(nouaCoordBi)
                     costMutari += copieD[nouaCoordBi[0]][nouaCoordBi[1]] **2
                 else:
-                    pozSfereNoi.append(nodCurent.sfere[i])
+                    pozSfereNoi.append(nodCurent.sfere[i])          #nu mut bila
                     # print("O bila deja a iesit")
 
                 # print("Noua Poz pt bila " + str(i+1) + " = " + str(nouaCoordBi))
 
             ok = 1                              # pentru a sari variantele in care bilele sunt pe margine si nu sunt stari fin / 2b ac turn
-            for poz in pozSfereNoi:
-                if pozSfereNoi.count(poz) > 1:
+            for poz in pozSfereNoi:     # unde sunt bilele dupa mutari
+                if pozSfereNoi.count(poz) > 1:      # sa nu fie 2 bile pe acelasi turn
                     ok = 0
                     break
-                if poz not in self.scopuri:
+                if poz not in self.scopuri:             # daca e pe marginea matricei si nu e stare finala
                     if poz[0] == 0 or poz[0] == len(self.start) or poz[1] == 0 or poz[1] == len(self.start):
                         ok = 0
                         break
@@ -285,6 +284,7 @@ class Graph:
 
             # acm aici trebuie sa generezi ob de tip parcurgeNod  si sa adaugi in succesori
 
+            # daca cel ptn 1 sfera s-a mutat de pe pot initiala + sa nu se repete poz sferelor in parinti pr a face bucla
             if pozSfereNoi != nodCurent.sfere and not nodCurent.contineInDrum(list(pozSfereNoi)):
                 # def __init__(self, id, info, matSchimbari, sfere, parent, cost=0, h=0):
                 listaSuccesori.append(parcurgeNod(nodCurent.id + 1, copieM, copieD, list(pozSfereNoi), nodCurent,
@@ -349,10 +349,10 @@ class Graph:
 def verifFile(numeFile):
     f = open(numeFile,"r")
     primaLinie = f.readline()
-    primaLinie = primaLinie.split()
+    primaLinie = primaLinie.split()     # prima linie si pun elem intr o  lista cu split
     # print(primaLinie)
 
-    if len(primaLinie) != 2:
+    if len(primaLinie) != 2:            #daca nu am 2 el pe prima linie
         print("Nu respecta prima linie")
         return False
 
@@ -369,40 +369,44 @@ def verifFile(numeFile):
     # print(sir[1])
 
     matrice  = sir[0]
-    matrice = matrice.split("\n")
-    nrL = len(matrice)
+    matrice = matrice.split("\n")    # iau liniile matricei date (randuri pana la "sfere")
+    nrL = len(matrice)          # nr de linii ale matricei
     # print(nrL)
     for linie in matrice:
         linie = linie.split()
         # print(linie)
         if len(linie) != nrL:
-            print("Insuficiente elem pe linie")
+            print("Insuficiente elem pe linie")         # daca nr coloane de nr linii
             return False
         for elem in linie:
             if not elem.isnumeric():
-                print("Nu e numar")
+                print("Nu e numar")         # daca nu am numere in matrice
                 return False
 
     sir1 = sir[1].split("\niesiri\n")
     # print(sir1[0])
     # print(sir1[1])
-    sfere  = sir1[0].split("\n")
-    for rand in sfere:
+    sfere  = sir1[0].split("\n")            #poz sfere
+    for rand in sfere:              # pt fiecare rand de sfere
         rand = rand.split()
-        if len(rand) != 2:
+        if len(rand) != 2:                  # daca mai mult de 2 elem pe linie
             print("coord gresite sfere")
             return False
 
         for elem in rand:
             # print(elem)
-            if not elem.isnumeric():
+            if not elem.isnumeric():                    # daca nu e nr coordonata
                 print("Nu e numar")
                 return False
-            if elem == '0' or elem == str(nrL - 1):
+            if elem == '0' or elem == str(nrL - 1):                 # daca bila e pe margine nu e bine !!!!!!!!
                 print("e pe margine din input o bila")
                 return False
+            if int(elem) < 0  or int(elem) >= nrL:              # daca coord data e mai mare ca
+                print("nu sunt coord reale")
+                return False
 
-    iesire = sir1[1].split("\n")
+
+    iesire = sir1[1].split("\n")                # lista de iesiri
     for rand in iesire:
         rand  = rand.split()
         if len(rand) != 2:
@@ -414,9 +418,12 @@ def verifFile(numeFile):
             if not elem.isnumeric():
                 print("Nu e numar")
                 return False
+            if int(elem) < 0  or int(elem) >= nrL:              # daca coord data e mai mare ca
+                print("nu sunt coord reale")
+                return False
             if elem == '0' or elem == str(nrL - 1):
                 margine += 1
-        if margine == 0:
+        if margine == 0:                                   # daca nu se afla pe margine iesirea rFalse
             print("poarta nu e pe marginea matricei")
             return False
 
@@ -424,7 +431,7 @@ def verifFile(numeFile):
     return True
 
 
-def check_time(start, limit):
+def check_time(start, limit):       #  functie care verifica sa nu fi depasit o limita de timp
     actual = time.time()
     if actual - start > limit:
         return True
@@ -436,6 +443,7 @@ lmaxSuc = []
 lmaxCoada = []
 lTimpi = []
 maxSuc = 0
+
 maxCoada = 0   # nr el coada cand avem recursie
 
 

@@ -766,8 +766,6 @@ def a_star_optim(gr, tip_euristica, timeout):
 
 
 
-
-
 # for i in range(len(sys.argv)):
 #     print("Argumentul {} are valoarea {} si tipul de date {}".format(i, sys.argv[i], type(sys.argv[i])))
 listaFisiereInput = os.listdir(sys.argv[1])
@@ -820,15 +818,19 @@ while ok:
                     if sol == "depasit timp":
                         f.write(sol)
                     else:
-                        i = 0
-                        for elem in sol:
+                        try:
+                            i = 0
+                            for elem in sol:
 
-                            f.write(elem.afisDrum()[1])
-                            f.write("\nMax de succesori generati =  " +str(lmaxSuc[i]) +"\n")
-                            f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
-                            f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
-                            f.write("\n----------------\n\n")
-                            i+=1
+                                f.write(elem.afisDrum()[1])
+                                f.write("\nMax de succesori generati =  " +str(lmaxSuc[i]) +"\n")
+                                f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                                f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
+                                f.write("\n----------------\n\n")
+                                i+=1
+                        except:
+                            print("nu ex sol")
+                            f.write("nu ex sol")
                 else:
                     print("Euristica gresita")
         else:
@@ -1026,7 +1028,6 @@ while ok:
 
 
 # python main.py folder_input folder_output 2 10
-
 
 
 

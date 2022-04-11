@@ -833,6 +833,10 @@ while ok:
                             f.write("nu ex sol")
                 else:
                     print("Euristica gresita")
+            else:
+                print("nu ex sol")
+                f = open("folder_output\\output_" +  valInput, "w")
+                f.write("nu ex sol")
         else:
             print("file invalid")
 
@@ -863,12 +867,20 @@ while ok:
                     if sol == "depasit timp":
                         f.write(sol)
                     else:
+                        try:
                             f.write(sol.afisDrum()[1])
                             f.write("\nMax de succesori generati =  " + str(lmaxSuc[0]) + "\n")
                             f.write("Nr de el dinlista =  " + str(lmaxCoada[0]) + "\n")
                             f.write("Timp gasire =  " + str(lTimpi[0]) + "\n")
+                        except:
+                            print("Nu ex sol")
+                            f.write("Nu ex sol")
                 else:
                     print("Euristica gresita")
+            else:
+                print("nu ex sol")
+                f = open("folder_output\\output_" +  valInput, "w")
+                f.write("nu ex sol")
         else:
             print("file invalid")
 
@@ -899,15 +911,22 @@ while ok:
                 if sol == "depasit timp":
                     f.write(sol)
                 else:
-                    i = 0
-                    for elem in sol:
-                        f.write(elem.afisDrum()[1])
-                        f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
-                        f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
-                        f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
-                        f.write("\n----------------\n\n")
-                        i+=1
-
+                    try:
+                        i = 0
+                        for elem in sol:
+                            f.write(elem.afisDrum()[1])
+                            f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                            f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                            f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
+                            f.write("\n----------------\n\n")
+                            i+=1
+                    except:
+                        print("Nu ex sol")
+                        f.write("Ne ex sol")
+            else:
+                print("nu ex sol")
+                f = open("folder_output\\output_" +  valInput, "w")
+                f.write("nu ex sol")
         else:
             print("file invalid")
     if optioune == "4":
@@ -937,15 +956,22 @@ while ok:
                 if sol == []:
                     f.write("Limata timp depasita")
                 else:
-                    i = 0
-                    for elem in sol:
-                        f.write(elem.afisDrum()[1])
-                        f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
-                        f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
-                        f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
-                        f.write("\n----------------\n\n")
-                        i += 1
-
+                    try:
+                        i = 0
+                        for elem in sol:
+                            f.write(elem.afisDrum()[1])
+                            f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                            f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                            f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
+                            f.write("\n----------------\n\n")
+                            i += 1
+                    except:
+                        print("Nu ex sol")
+                        f.write("Ne ex sol")
+            else:
+                print("nu ex sol")
+                f = open("folder_output\\output_" +  valInput, "w")
+                f.write("nu ex sol")
         else:
             print("file invalid")
     if optioune == "5":
@@ -975,15 +1001,22 @@ while ok:
                 if sol == []:
                     f.write("Limata timp depasita")
                 else:
-                    i = 0
-                    for elem in sol:
-                        f.write(elem.afisDrum()[1])
-                        f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
-                        f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
-                        f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
-                        f.write("\n----------------\n\n")
-                        i += 1
-
+                    try:
+                        i = 0
+                        for elem in sol:
+                            f.write(elem.afisDrum()[1])
+                            f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                            f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                            f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
+                            f.write("\n----------------\n\n")
+                            i += 1
+                    except:
+                        print("Nu ex sol")
+                        f.write("Ne ex sol")
+            else:
+                print("nu ex sol")
+                f = open("folder_output\\output_" +  valInput, "w")
+                f.write("nu ex sol")
         else:
             print("file invalid")
     if optioune == "6":
@@ -1012,14 +1045,22 @@ while ok:
                 if sol == []:
                     f.write("Limata timp depasita")
                 else:
-                    i = 0
-                    for elem in sol:
-                        f.write(elem.afisDrum()[1])
-                        f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
-                        f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
-                        f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
-                        f.write("\n----------------\n\n")
-                        i += 1
+                    try:
+                        i = 0
+                        for elem in sol:
+                            f.write(elem.afisDrum()[1])
+                            f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                            f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                            f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
+                            f.write("\n----------------\n\n")
+                            i += 1
+                    except:
+                        print("Problema fisier")
+                        f.write("Problema fisier")
+            else:
+                print("nu ex sol")
+                f = open("folder_output\\output_" +  valInput, "w")
+                f.write("nu ex sol")
         else:
             print("file invalid")
     elif optioune == "7":

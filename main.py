@@ -307,7 +307,7 @@ class Graph:
         elif tip_euristica == "admisibila1":
             h = []
             for infoBila in pozitieSfere:
-                min = 1000
+                min = 100000
                 for poarta in self.scopuri:
                     dist = abs(poarta[0] - infoBila[0]) + abs(poarta[1] - infoBila[1])
                     if dist < min:
@@ -317,16 +317,18 @@ class Graph:
         elif tip_euristica == "admisibila2":
             h = []
             for infoBila in pozitieSfere:
-                min = 1000
+                min = 100000
                 cost = 0
                 for poarta in self.scopuri:
                     dist = abs(poarta[0] - infoBila[0]) + abs(poarta[1] - infoBila[1])
+                    cost = matTurnuri[poarta[0]][poarta[1]] - matTurnuri[infoBila[0]][infoBila[1]]
+                    if cost < 0:
+                        cost = 0
+                    dist += cost
                     if dist < min:
                         min = dist
-                        cost = matTurnuri[poarta[0]][poarta[1]] - matTurnuri[infoBila[0]][infoBila[1]]
-                        if cost < 0:
-                            cost = 0
-                h.append(min+cost)
+
+                h.append(min)
             return max(h)
         elif tip_euristica == "euristica_neadmisibila":
             h = 0
@@ -632,13 +634,13 @@ def breadth_first(gr, nrSolutiiCautate, tip_euristica, timeout):
     lTimpi = []
     maxSuc = 0
 
-
+    maxC = 0
     while len(c) > 0:
         if check_time(t1,timeout):
             print("depasit timp")
             a = "depasit timp"
             return a
-
+        maxC = max(len(c), maxC)
         # print("Coada actuala: " + str(c))
         nodCurent = c.pop(0)
 
@@ -646,7 +648,7 @@ def breadth_first(gr, nrSolutiiCautate, tip_euristica, timeout):
             print("Solutie:")
             nodCurent.afisDrum()
             sol.append(nodCurent)
-            lmaxCoada.append(len(c))
+            lmaxCoada.append(maxC)
             lmaxSuc.append(maxSuc)
             t2 = time.time()
             lTimpi.append(t2 - t1)
@@ -668,12 +670,13 @@ def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
     lmaxSuc = []
     lTimpi = []
     maxSuc = 0
+    maxC = 0
     while len(c) > 0:
         if check_time(t1,timeout):
             print("depasit timp")
             a = "depasit timp"
             return a
-
+        maxC = max(len(c),maxC)
         # print("DIMENSIUNEA COZII = " + str(len(c)))
         # print(str(c))
         nodCurent = c.pop(0)
@@ -681,7 +684,7 @@ def a_star(gr2, nrSolutiiCautate, tip_euristica, timeout):
             t2 = time.time()
             print("Solutie: ")
             sol.append(nodCurent)
-            lmaxCoada.append(len(c))
+            lmaxCoada.append(maxC)
             lmaxSuc.append(maxSuc)
             lTimpi.append(t2 - t1)
             nodCurent.afisDrum()
@@ -715,7 +718,7 @@ def a_star_optim(gr, tip_euristica, timeout):
     lmaxSuc = []
     lTimpi = []
     maxSuc = 0
-
+    maxC = 0
     t1 = time.time()
     # l_open contine nodurile candidate pentru expandare (este echivalentul lui c din A* varianta neoptimizata)
 
@@ -726,6 +729,7 @@ def a_star_optim(gr, tip_euristica, timeout):
             print("depasit timp")
             a = "depasit timp"
             return a
+        maxC = max(len(l_open), maxC)
         # print("DIMENSIUNEA COZII = " + str(len(c)))
         # print(str(c))
         nodCurent = l_open.pop(0)
@@ -734,7 +738,7 @@ def a_star_optim(gr, tip_euristica, timeout):
         if gr.testeazaScop(nodCurent):
             print("Solutie: ", end="")
             nodCurent.afisDrum()
-            lmaxCoada.append(len(l_open))
+            lmaxCoada.append(maxC)
             lmaxSuc.append(maxSuc)
             t2 = time.time()
             lTimpi.append(t2 - t1)

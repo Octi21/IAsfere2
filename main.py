@@ -447,7 +447,7 @@ maxSuc = 0
 maxCoada = 0   # nr el coada cand avem recursie
 
 
-def construieste_drum(gr, nodCurent, limita, nrSolutiiCautate, timeout, t1):
+def construieste_drum(gr, nodCurent, limita, nrSolutiiCautate, timeout, t1, euristica):
     # print("A ajuns la: ", nodCurent)
     global maxSuc, maxCoada
     if check_time(t1, timeout):
@@ -471,12 +471,12 @@ def construieste_drum(gr, nodCurent, limita, nrSolutiiCautate, timeout, t1):
         nrSolutiiCautate -= 1
         if nrSolutiiCautate == 0:
             return 0, "gata"
-    lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica="euristica_banala")
+    lSuccesori = gr.genereazaSuccesori2(nodCurent,tip_euristica=euristica)
     maxSuc = max(maxSuc, len(lSuccesori))
     maxCoada += len(lSuccesori)
     minim = float('inf')
     for s in lSuccesori:
-        nrSolutiiCautate, rez = construieste_drum(gr, s, limita, nrSolutiiCautate, timeout, t1)
+        nrSolutiiCautate, rez = construieste_drum(gr, s, limita, nrSolutiiCautate, timeout, t1,euristica)
         if rez == "gata":
             return 0, "gata"
         if rez == "depasit timp":
@@ -489,7 +489,7 @@ def construieste_drum(gr, nodCurent, limita, nrSolutiiCautate, timeout, t1):
             # print("Noul minim: ", minim)
     return nrSolutiiCautate, minim
 
-def ida_star(gr, nrSolutiiCautate, timeout):
+def ida_star(gr, nrSolutiiCautate, timeout,euristica):
     t1 = time.time()
     nodStart = parcurgeNod(1,gr.start,None,gr.sfere,None,0,0)
     global sol
@@ -505,7 +505,7 @@ def ida_star(gr, nrSolutiiCautate, timeout):
     while True:
 
         # print("Limita de pornire: ", limita)
-        nrSolutiiCautate, rez = construieste_drum(gr, nodStart, limita, nrSolutiiCautate, timeout, t1)
+        nrSolutiiCautate, rez = construieste_drum(gr, nodStart, limita, nrSolutiiCautate, timeout, t1,euristica)
         if rez == "gata" or rez == "depasit timp":
             break
         if rez == float('inf'):
@@ -1030,33 +1030,37 @@ while ok:
                 gr = Graph(valInput2)
                 parcurgeNod.gr = gr
 
+                print(listaEur)
+                euristica = input("alege euristica = ")
                 # print(listaEur)
                 # euristica = input("alege euristica = ")
                 # euristica_banala
                 # admisibila1
                 # euristica_neadmisibila
+                if euristica in listaEur:
+                    t0 = time.time()
+                    sol = ida_star(gr, nrSolutiiCautate = nrSol, timeout = timeout,euristica = euristica)
+                    t1 = time.time()
+                    print("Alg a durat = " + str(t1 - t0))
 
-                t0 = time.time()
-                sol = ida_star(gr, nrSolutiiCautate = nrSol, timeout = timeout)
-                t1 = time.time()
-                print("Alg a durat = " + str(t1 - t0))
-
-                f = open("folder_output\\output_" + valInput, "w")
-                if sol == []:
-                    f.write("Limata timp depasita")
+                    f = open("folder_output\\output_" + valInput, "w")
+                    if sol == []:
+                        f.write("Limata timp depasita")
+                    else:
+                        try:
+                            i = 0
+                            for elem in sol:
+                                f.write(elem.afisDrum()[1])
+                                f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
+                                f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
+                                f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
+                                f.write("\n----------------\n\n")
+                                i += 1
+                        except:
+                            print("Problema fisier")
+                            f.write("Problema fisier")
                 else:
-                    try:
-                        i = 0
-                        for elem in sol:
-                            f.write(elem.afisDrum()[1])
-                            f.write("\nMax de succesori generati =  " + str(lmaxSuc[i]) + "\n")
-                            f.write("Nr de el dinlista =  " + str(lmaxCoada[i]) + "\n")
-                            f.write("Timp gasire =  " + str(lTimpi[i]) + "\n")
-                            f.write("\n----------------\n\n")
-                            i += 1
-                    except:
-                        print("Problema fisier")
-                        f.write("Problema fisier")
+                    print("ne ex eur")
             else:
                 print("nu ex sol")
                 f = open("folder_output\\output_" +  valInput, "w")

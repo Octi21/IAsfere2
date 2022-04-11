@@ -1077,7 +1077,7 @@ while ok:
 
 
 # python main.py folder_input folder_output 2 10
-
+# https://docs.google.com/document/d/1Mjwxx8uiVJ28_c8nSB1f_fJjmOC_41jXjMlbCUC8Ngg/edit?usp=sharing
 
 
 

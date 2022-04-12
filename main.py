@@ -156,8 +156,8 @@ class Graph:
     def testeazaScop(self, nodCurent):          # verif daca bilele sunt la porti
         locSfere = nodCurent.sfere
         for loc in locSfere:
-            if locSfere.count(loc) > 1:
-                return False
+            # if locSfere.count(loc) > 1:
+            #     return False
             if self.scopuri.count(loc) == 0:
                 return False
         return True
@@ -272,9 +272,10 @@ class Graph:
 
             ok = 1                              # pentru a sari variantele in care bilele sunt pe margine si nu sunt stari fin / 2b ac turn
             for poz in pozSfereNoi:     # unde sunt bilele dupa mutari
-                if pozSfereNoi.count(poz) > 1:      # sa nu fie 2 bile pe acelasi turn
-                    ok = 0
-                    break
+                if pozSfereNoi.count(poz) > 1:      # sa nu fie 2 bile pe acelasi turn (cat timp nu e poarta)
+                    if poz not in self.scopuri:
+                        ok = 0
+                        break
                 if poz not in self.scopuri:             # daca e pe marginea matricei si nu e stare finala
                     if poz[0] == 0 or poz[0] == len(self.start) or poz[1] == 0 or poz[1] == len(self.start):
                         ok = 0
